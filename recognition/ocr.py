@@ -12,7 +12,7 @@ def ocr_recog(image_path, debug=False):
     img = Image.open(preprocessed_image_path)
     
 
-    text = pytesseract.image_to_string(img, config="--oem 1")
+    text = pytesseract.image_to_string(img, config="--oem 1 --psm 6")
 
     if debug == True:
         print("Detected Text:")
