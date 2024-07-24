@@ -37,7 +37,7 @@ class DrawingPad(tk.Frame):
                 self.last_y,
                 x,
                 y,
-                width=8,
+                width=10,
                 fill="black",
                 capstyle=tk.ROUND,
                 smooth=True,

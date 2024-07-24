@@ -10,4 +10,4 @@ def parse_and_solve_equation(equation):
             result = solve_equation(equation)
             return result
         except Exception as e:
-            return f"Error solving equation: {e}"
+            pass
