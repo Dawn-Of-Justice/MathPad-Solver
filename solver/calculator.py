@@ -19,7 +19,9 @@ def solve_equation(equation):
         right_side_simplified = sympify(right_side)
 
         # Determine all symbols in the equation
-        all_symbols = left_side_simplified.free_symbols | right_side_simplified.free_symbols
+        all_symbols = (
+            left_side_simplified.free_symbols | right_side_simplified.free_symbols
+        )
         if not all_symbols:
             raise ValueError("No variables found in the equation.")
 
