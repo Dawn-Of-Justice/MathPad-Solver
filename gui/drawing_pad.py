@@ -17,7 +17,7 @@ class DrawingPad(tk.Frame):
         self.equation_text = tk.StringVar()
         self.answer_label = tk.Label(self, text="", font=("Arial", 12))
         self.answer_label.pack()
-        self.loaded_model = load_model(r'C:\Users\salos\MathPad-Solver\recognition\custom_model\test_model.h5')
+        self.loaded_model = load_model(r'C:\Users\salos\MathPad-Solver\recognition\custom_model\Augmented_model.h5')
         self.segmenter = HandwrittenEquationSegmenter()
 
     def on_button_press(self, event):
