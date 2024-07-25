@@ -19,7 +19,7 @@ class DrawingPad(tk.Frame):
         self.answer_label = tk.Label(self, text="", font=("Arial", 12))
         self.answer_label.pack()
         self.loaded_model = load_model(
-            r"C:\Users\salos\MathPad-Solver\recognition\custom_model\adv_model.h5"
+            r'recognition\custom_model\adv_model.h5'
         )
         self.segmenter = HandwrittenEquationSegmenter()
 
