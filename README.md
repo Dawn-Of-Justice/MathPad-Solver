@@ -4,6 +4,8 @@
 
 This project aims to create a Python application that can recognize and solve handwritten mathematical equations in real-time. Users can write equations using a graphical interface, and the program will recognize the handwritten text using a Convolutional Neural Network (CNN), parse the equation, solve it, and display the result.
 
+![Calculator](https://github.com/Dawn-Of-Justice/MathPad-Solver/blob/master/Calculator.gif)
+
 ## Features
 
 - **Handwriting Recognition**: Uses a CNN to recognize handwritten numbers and basic mathematical operators.
