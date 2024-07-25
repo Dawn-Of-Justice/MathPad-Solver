@@ -6,7 +6,7 @@ class HandwrittenEquationSegmenter:
     def __init__(self, input_shape=(28, 28), y_threshold=40):
         self.input_shape = input_shape
         self.y_threshold = y_threshold
-        self.index_to_label = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'add',
+        self.index_to_label = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'add','dec',
                    'div', 'eq', 'mul', 'sub', 'x', 'y', 'z']
 
     def preprocess_image(self, image_path):
@@ -37,14 +37,30 @@ class HandwrittenEquationSegmenter:
         equations.append(current_equation)
         return equations
 
-    def segment_characters(self, binary_image, bounding_boxes):
+    def segment_characters(self, binary_image, bounding_boxes, pad_size=30):
         characters = []
         for box in bounding_boxes:
             x, y, w, h = box
             char_image = binary_image[y:y+h, x:x+w]
-            char_image = cv2.resize(char_image, self.input_shape)  # Resize to input shape
-            char_image = np.expand_dims(char_image, axis=-1)  # Add channel dimension
-            characters.append(char_image)
+            
+            # Convert to 3-channel RGB (required for padding function)
+            char_image_rgb = cv2.cvtColor(char_image, cv2.COLOR_GRAY2RGB)
+            
+            # Pad the image
+            char_image_padded = cv2.copyMakeBorder(char_image_rgb, pad_size, pad_size, pad_size, pad_size, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+            
+            # Resize to input shape
+            char_image_resized = cv2.resize(char_image_padded, self.input_shape)
+            
+            # Convert back to grayscale
+            char_image_gray = cv2.cvtColor(char_image_resized, cv2.COLOR_RGB2GRAY)
+
+            char_image_gray = 255 - char_image_gray  # Invert the image
+            
+            # Add channel dimension
+            char_image_gray = np.expand_dims(char_image_gray, axis=-1)
+            
+            characters.append(char_image_gray)
         return characters
 
     def display_characters(self, char_images):
@@ -73,35 +89,49 @@ class HandwrittenEquationSegmenter:
             recognized_sequence.append(recognized_char)
         
         # Post-process to correct specific misclassifications
-        # For example, if two consecutive 'sub' symbols are detected, change them to 'eq'
         corrected_sequence = []
         i = 0
         while i < len(recognized_sequence):
-            if recognized_sequence[i] == 'sub':
-                if i + 1 < len(recognized_sequence) and recognized_sequence[i + 1] == 'sub':
+            print(recognized_sequence)
+            if recognized_sequence[i] == 'div':
+                if (i + 2 < len(recognized_sequence) and 
+                    recognized_sequence[i + 1] == '0' and 
+                    recognized_sequence[i + 2] == '0'):
+                    corrected_sequence.append('div')
+                    i += 3  # Skip the next '0' and '0' as they are combined with 'div'
+                elif i + 1 < len(recognized_sequence) and recognized_sequence[i + 1] == 'div':
                     corrected_sequence.append('eq')
-                    i += 1  # Skip the next 'sub' as it's combined with the current one
+                    i += 2  # Skip the next 'div' as it's combined with the current one
                 else:
                     corrected_sequence.append('sub')
+                    i += 1
             else:
                 corrected_sequence.append(recognized_sequence[i])
-            i += 1
+                i += 1
         
         return corrected_sequence
 
-    def process_image(self, image_path, model, debug=False):
+
+    def process_image(self, image_path, model, debug=False, pad_size=5):
         binary_image = self.preprocess_image(image_path)
         original_image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)  # Load original image for drawing
         num_labels, labels, stats, centroids = self.detect_connected_components(binary_image)
         equations = self.group_components(stats)
 
         all_recognized_characters = []
+        text_equations = []
+
+        symbol_mapping = {
+            'add': '+',
+            'sub': '-',
+            'mul': '*',
+            'div': '/',
+            'eq': '='
+        }
 
         for equation in equations:
-            # Convert stats to a list of bounding boxes
             bounding_boxes = [tuple(stats[i + 1][:4]) for i in range(len(stats) - 1)]
             
-            # Filter bounding boxes that are in the current equation
             filtered_boxes = []
             for box in bounding_boxes:
                 x, y, w, h = box
@@ -111,23 +141,28 @@ class HandwrittenEquationSegmenter:
                         filtered_boxes.append(box)
                         break
 
-            # Sort bounding boxes for correct left-to-right order within each equation
             filtered_boxes.sort(key=lambda b: b[0])  # Sort by x-coordinate
 
-            characters = self.segment_characters(binary_image, filtered_boxes)
+            characters = self.segment_characters(binary_image, filtered_boxes, pad_size)
             if debug:
                 self.display_characters(characters)
             
             recognized_characters = self.recognize_characters(characters, model)
             print(recognized_characters)
-            all_recognized_characters.extend(recognized_characters)
+            all_recognized_characters.append(recognized_characters)
 
-            # Draw equations on the image
+            # Convert recognized characters to text
+            text_equation = ''.join([symbol_mapping.get(char, char) for char in recognized_characters])
+            # Handle duplicate '=' detection
+            if '==' in text_equation:
+                text_equation = text_equation.replace('==', '=')
+            
+            text_equations.append(text_equation)
+
             if debug:
-                # Display the image with bounding boxes and annotations
                 image_with_equations = self.draw_equations(original_image, filtered_boxes, recognized_characters)
                 cv2.imshow('Recognized Equations', image_with_equations)
                 cv2.waitKey(0)  # Wait for a key press to close the window
                 cv2.destroyAllWindows()  # Close the window
         
-        return all_recognized_characters
+        return text_equations

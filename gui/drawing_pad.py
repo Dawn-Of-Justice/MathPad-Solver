@@ -1,8 +1,8 @@
 import os
 import tkinter as tk
 from PIL import ImageGrab
-from recognition import ocr_recog
-
+from recognition import HandwrittenEquationSegmenter
+from tensorflow.keras.models import load_model # type: ignore
 
 class DrawingPad(tk.Frame):
     def __init__(self, parent, evaluate_callback):
@@ -17,6 +17,8 @@ class DrawingPad(tk.Frame):
         self.equation_text = tk.StringVar()
         self.answer_label = tk.Label(self, text="", font=("Arial", 12))
         self.answer_label.pack()
+        self.loaded_model = load_model(r'C:\Users\salos\MathPad-Solver\recognition\custom_model\test_model.h5')
+        self.segmenter = HandwrittenEquationSegmenter()
 
     def on_button_press(self, event):
         self.last_x, self.last_y = event.x, event.y
@@ -55,8 +57,8 @@ class DrawingPad(tk.Frame):
         image = ImageGrab.grab().crop((x, y, x1, y1))
         image_path = os.path.join(os.getcwd(), "captured_image.png")
         image.save(image_path)
-        text = ocr_recog(image_path)
-        return text
+        equations = self.segmenter.process_image(image_path, self.loaded_model)
+        return equations
 
     def clear(self):
         self.canvas.delete("all")

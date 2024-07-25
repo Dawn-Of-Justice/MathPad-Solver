@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from gui.drawing_pad import DrawingPad
-from solver.parser import parse_and_solve_equation
+from solver.calculator import solve_equation
 
 
 class MainWindow:
@@ -53,16 +53,19 @@ class MainWindow:
         if equation:
             try:
                 self.display_converted_text(equation)
-                answer = parse_and_solve_equation(equation)
+                answer = solve_equation(equation)
                 if answer:
                     self.display_answer(answer)
             except Exception as e:
                 messagebox.showerror("Error", str(e))
 
-    def display_converted_text(self, text):
+    def display_converted_text(self, text_equations):
         self.converted_text.config(state=tk.NORMAL)
         self.converted_text.delete(1.0, tk.END)  # Clear existing text
-        self.converted_text.insert(tk.END, text)  # Insert new text
+        
+        for equation in text_equations:
+            self.converted_text.insert(tk.END, equation + '\n')  # Insert each equation followed by a newline
+        
         self.converted_text.config(state=tk.DISABLED)
 
     def display_answer(self, answer):
