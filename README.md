@@ -25,7 +25,7 @@ This project aims to create a Python application that can recognize and solve ha
 
 2. **Install Python Dependencies**
 
-   Install the required Python packages using pip:
+   Install the required Python packages using pip(Recommended to use a virtual env!):
 
    ```bash
    pip install -r requirements.txt
