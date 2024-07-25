@@ -62,10 +62,12 @@ class MainWindow:
     def display_converted_text(self, text_equations):
         self.converted_text.config(state=tk.NORMAL)
         self.converted_text.delete(1.0, tk.END)  # Clear existing text
-        
+
         for equation in text_equations:
-            self.converted_text.insert(tk.END, equation + '\n')  # Insert each equation followed by a newline
-        
+            self.converted_text.insert(
+                tk.END, equation + "\n"
+            )  # Insert each equation followed by a newline
+
         self.converted_text.config(state=tk.DISABLED)
 
     def display_answer(self, answer):

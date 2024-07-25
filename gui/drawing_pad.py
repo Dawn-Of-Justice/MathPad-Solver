@@ -2,7 +2,8 @@ import os
 import tkinter as tk
 from PIL import ImageGrab
 from recognition import HandwrittenEquationSegmenter
-from tensorflow.keras.models import load_model # type: ignore
+from tensorflow.keras.models import load_model  # type: ignore
+
 
 class DrawingPad(tk.Frame):
     def __init__(self, parent, evaluate_callback):
@@ -17,7 +18,9 @@ class DrawingPad(tk.Frame):
         self.equation_text = tk.StringVar()
         self.answer_label = tk.Label(self, text="", font=("Arial", 12))
         self.answer_label.pack()
-        self.loaded_model = load_model(r'C:\Users\salos\MathPad-Solver\recognition\custom_model\my_model.h5')
+        self.loaded_model = load_model(
+            r"C:\Users\salos\MathPad-Solver\recognition\custom_model\adv_model-2.h5"
+        )
         self.segmenter = HandwrittenEquationSegmenter()
 
     def on_button_press(self, event):
