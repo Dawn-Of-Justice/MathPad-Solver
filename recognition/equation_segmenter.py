@@ -6,8 +6,8 @@ class HandwrittenEquationSegmenter:
     def __init__(self, input_shape=(28, 28), y_threshold=40):
         self.input_shape = input_shape
         self.y_threshold = y_threshold
-        self.index_to_label = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'add','dec',
-                   'div', 'eq', 'mul', 'sub', 'x', 'y', 'z']
+        self.index_to_label = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'add','dec'
+            'div', 'eq', 'mul', 'sub', 'x', 'y', 'z']
 
     def preprocess_image(self, image_path):
         image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
@@ -93,13 +93,13 @@ class HandwrittenEquationSegmenter:
         i = 0
         while i < len(recognized_sequence):
             print(recognized_sequence)
-            if recognized_sequence[i] == 'div':
+            if recognized_sequence[i] == 'sub':
                 if (i + 2 < len(recognized_sequence) and 
                     recognized_sequence[i + 1] == '0' and 
                     recognized_sequence[i + 2] == '0'):
-                    corrected_sequence.append('div')
+                    corrected_sequence.append('sub')
                     i += 3  # Skip the next '0' and '0' as they are combined with 'div'
-                elif i + 1 < len(recognized_sequence) and recognized_sequence[i + 1] == 'div':
+                elif i + 1 < len(recognized_sequence) and recognized_sequence[i + 1] == 'sub':
                     corrected_sequence.append('eq')
                     i += 2  # Skip the next 'div' as it's combined with the current one
                 else:
