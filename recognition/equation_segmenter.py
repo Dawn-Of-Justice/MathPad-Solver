@@ -129,7 +129,7 @@ class HandwrittenEquationSegmenter:
         corrected_sequence = []
         i = 0
         while i < len(recognized_sequence):
-            print(recognized_sequence)
+            #print(recognized_sequence)
             if recognized_sequence[i] == "sub":
                 if (
                     i + 2 < len(recognized_sequence)
@@ -187,7 +187,7 @@ class HandwrittenEquationSegmenter:
                 self.display_characters(characters)
 
             recognized_characters = self.recognize_characters(characters, model)
-            print(recognized_characters)
+            #print(recognized_characters)
             all_recognized_characters.append(recognized_characters)
 
             # Convert recognized characters to text

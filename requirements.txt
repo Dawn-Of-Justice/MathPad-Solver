@@ -1,6 +1,9 @@
 opencv-python
 sympy
 numpy
+pillow
 tk
 pandas
 tensorflow
+ matplotlib
+scikit-learn
